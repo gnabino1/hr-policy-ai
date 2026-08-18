@@ -1,0 +1,29 @@
+""" Step 4: Create a vector store for the document chunks using the FAISS vector store. So, we can search thme """
+import os
+from langchain_community.vectorstores import FAISS
+from hr_assistant import config
+from hr_assistant.embeddings import get_embeddings_model
+
+
+def build_vector_store(chunks):
+    """ Embed every chunk and build a searchable FAISS Index in memeory."""
+    embeddings_model= get_embeddings_model()
+    return FAISS.from_documents(chunks, embeddings_model)
+
+## Save Vector Store to Disk
+def save_vector_store(vector_store, path: str = config.VECTOR_STORE_PATH):
+    """" Save the FAISS Index to disk. SO we don't have to rebuild it every time """
+    vector_store.save_local(path)
+
+def load_vector_store(path: str = config.VECTOR_STORE_PATH):
+    """ Load the FAISS Index from disk. """
+    embeddings_model= get_embeddings_model()
+    return FAISS.load_local(path, embeddings_model, allow_dangerous_deserialization=True)
+
+def vector_store_exists(path: str = config.VECTOR_STORE_PATH)-> bool:
+    """ Check if the FAISS Index exists on disk. """
+    return os.path.exists(os.path.join(path, "index.faiss"))
+
+def get_retriever(vector_store, top_k: int = config.TOP_K_RESULTS):
+    """ Get a retriever from the FAISS Index. """
+    return vector_store.as_retriever(search_kwargs={"k": top_k})

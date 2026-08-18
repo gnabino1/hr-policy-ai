@@ -1,0 +1,41 @@
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+## ENV VAR /SECRET
+
+GROK_API_KEY= os.getenv("GROQ_API_KEY")
+JINA_API_KEY= os.getenv("JINA_API_KEY")
+
+## DEFINE PATH
+# DATA
+DATA_FILE_PATH= os.path.join("data", "hr_policy.txt")
+# VECTOR STORE
+VECTOR_STORE_PATH= os.path.join("data", "faiss_index")
+
+## MODELS
+# LLM AND EMBEDDING MODEL
+LLM_MODEL_NAME= "openai/gpt-oss-120b"
+EMBEDDING_MODEL_NAME= "jina-embeddings-v2-base-en"
+
+## CHUNK / TEXT SPLITTING CONFIG
+CHUNK_SIZE= 500
+CHUNK_OVERLAP= 50
+
+## RETRIEVAL RESULTS
+TOP_K_RESULTS= 3
+
+## SYSTEM INSTRUCTIONS
+SYSTEM_PROMPT= (
+    "You are a friendly HR Assistant. Alyways use the search_hr_policy to look up "
+    "facts before answering. If the answer isn't in the search results, say you don't know. "
+    "instead of guessing."
+)
+
+def check_api_keys()-> None:
+    """ Stop early if the API keys are not set in the .env file. """
+    if not GROK_API_KEY:
+        raise ValueError("GROQ_API_KEY is not set. Please set it in the .env file.")
+    if not JINA_API_KEY:
+        raise ValueError("JINA_API_KEY is not set. Please set it in the .env file.")
