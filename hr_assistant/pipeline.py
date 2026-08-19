@@ -16,24 +16,28 @@ from hr_assistant.vector_store import (
     vector_store_exists,
     get_retriever
 )
+from hr_assistant.logger import get_logger
+from hr_assistant.tracing import check_langsmith_tracing
 
+logger= get_logger(__name__)
 def build_vector_store_for_document(file_path: str = config.DATA_FILE_PATH):
     """ Load + split + embed the document, resuing a saved index if we have one"""
     if vector_store_exists():
-        print(" Found savd vector store on disk. Loading...")
-        return load_vector_store()
-    print("No saved vector store found, building one from scratch...")
+        logger.info("Found savd vector store on disk. Loading...")
+    logger.info("No saved vector store found, building one from scratch...")
     documents= load_document(file_path)
     chunks= split_into_chunks(documents)
-    print(f"Loaded '{file_path}' and split it into {len(chunks)} chunks.")
+    logger.info("Loaded '%s' and split it into %d chunks.", file_path, len(chunks))
     vector_store= build_vector_store(chunks)
     save_vector_store(vector_store)
-    print("vector store build and saved to disk for next time")
+    logger.info("vector store build and saved to disk for next time")
     return vector_store
 
 def build_hr_assistant(file_path: str= config.DATA_FILE_PATH):
     """ BUild the Full RAG Agent, ready to answer the questions"""
+    logger.info("Building HR Assistant...")
     config.check_api_keys()
+    check_langsmith_tracing()
     vector_store= build_vector_store_for_document(file_path)
     retriever= get_retriever(vector_store)
     search_tool= create_search_tool(retriever)
@@ -43,8 +47,11 @@ def build_hr_assistant(file_path: str= config.DATA_FILE_PATH):
 
 def ask(agent, question: str)-> str:
     """ Ask the agent a question and return its final answer in plaint text"""
+    logger.info("user Question: %s", question)
     response= agent.invoke({"messages":[{"role":"user", "content": question}]})
-    return response["messages"][-1].content
+    answer= response["messages"][-1].content
+    logger.info("Final Answer %s", answer) 
+    return answer
 
 
 
