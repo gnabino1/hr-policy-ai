@@ -9,7 +9,9 @@ langchain-groq
 langchain-text-splitters
 
 ## VECTOR STORE
-faiss-cpu
+#faiss-cpu-- migarted to langchain-qdrant
+langchain-qdrant
+qdrant-client
 
 ##notebook
 jupyter

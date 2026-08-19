@@ -17,11 +17,17 @@ LANGSMITH_ENDPOINT= os.getenv("LANGSMITH_ENDPOINT")
 LANGSMITH_API_KEY= os.getenv("LANGSMITH_API_KEY")
 LANGSMITH_PROJECT= os.getenv("LANGSMITH_PROJECT")
 
+
 ## DEFINE PATH
 # DATA
 DATA_FILE_PATH= os.path.join("data", "hr_policy.txt")
 # VECTOR STORE
-VECTOR_STORE_PATH= os.path.join("data", "faiss_index")
+# VECTOR_STORE_PATH= os.path.join("data", "faiss_index")
+
+## QDRANT VECTOR DB
+QDRANT_API_KEY= os.getenv("QDRANT_API_KEY")
+QDRANT_URL=os.getenv("QDRANT_URL")
+QDRANT_COLLECTION_NAME= os.getenv("QDRANT_COLLECTION_NAME")
 
 ## MODELS
 # LLM AND EMBEDDING MODEL
