@@ -38,9 +38,10 @@ logger= get_logger(__name__)
 # data ingestion
 def build_vector_store_for_document(file_path: str = config.DATA_FILE_PATH):
     """ Load + split + embed the document, resuing a Qdrant cloud if we have one"""
+    print("vector store exists: %s", vector_store_exists())
     if vector_store_exists():
         logger.info("Found existing QDrant Collection. Loading...")
-        load_vector_store()
+        return load_vector_store()
     logger.info("No saved vector store found, building one from scratch...")
     documents= load_document(file_path)
     chunks= split_into_chunks(documents)

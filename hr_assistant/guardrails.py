@@ -7,6 +7,8 @@
 """
 import json
 from langchain_groq import ChatGroq
+from langchain_openai import ChatOpenAI
+from portkey_ai import createHeaders, PORTKEY_GATEWAY_URL
 from hr_assistant import config
 from hr_assistant.logger import get_logger
 
@@ -16,7 +18,15 @@ REFUSAL_MESSAGE = "Sorry, I can't help with that request."
 
 #Since we are expecting json output as in groq-documentation so format response type
 _guard_llm = ChatGroq(model_name=config.GUARD_MODEL_NAME, temperature=0, model_kwargs={"response_format":{"type": "json_object"}})
-
+# _guard_llm = ChatOpenAI(
+#     api_key="portkey",
+#     base_url=PORTKEY_GATEWAY_URL,
+#     default_headers=createHeaders(
+#         api_key=config.PORTKEY_API_KEY,
+#         config=config.GUARD_PORTKEY_CONFIG
+#     ),
+#     temperature=0,
+# )
 ##
 # {
 #     "voliation": 1,
@@ -142,7 +152,6 @@ def _check_safety(text: str, policy: str)-> tuple[bool, str]:
 def check_input(question: str)-> tuple[bool, str]:
     """ Check the user's question before the agent sees it"""
     is_safe, reason= _check_safety(question, INPUT_POLICY)
-    logger.info("Check Saftety Input: %s- %s", is_safe, reason)
     if not is_safe:
         logger.warning("Input guard BLOCKED question: %s | reason: %s", question, reason )
     return is_safe, reason
@@ -151,7 +160,6 @@ def check_input(question: str)-> tuple[bool, str]:
 def check_output(answer: str)-> tuple[bool, str]:
     """ Check the agents answer before displaying to user"""
     is_safe, reason= _check_safety(answer, OUTPUT_POLICY)
-    logger.info("Check Saftety Output: %s-%s", is_safe, reason)
     if not is_safe:
         logger.warning("Output guard BLOCKED answer: %s | reason: %s", answer, reason )
     return is_safe, reason

@@ -13,5 +13,5 @@ def split_into_chunks(documents):
         length_function=len,
     )
     chunks = text_splitter.split_documents(documents)
-    logger.info("Chunk completed:", chunks)
+    logger.info("Chunk completed: %d", len(chunks))
     return chunks
